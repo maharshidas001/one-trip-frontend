@@ -62,16 +62,6 @@ const Trip: FC = () => {
     return null;
   };
 
-  if (!tripData) {
-    return (
-      <section className='py-10'>
-        <MaxWidth className='max-w-screen-lg p-0'>
-          <div>Trip not found</div>
-        </MaxWidth>
-      </section>
-    );
-  }
-
   return (
     <>
       <section className='py-10'>
@@ -84,16 +74,16 @@ const Trip: FC = () => {
               </div>
             </Link>
 
-            <h2 className="text-3xl text-black mt-3">{tripData.tripTitle}</h2>
+            <h2 className="text-3xl text-black mt-3">{tripData && tripData.tripTitle}</h2>
             <div className='w-full mt-4'>
               <div className='w-full py-2 px-3 bg-blue-100 rounded-lg flex gap-4 flex-wrap'>
-                <p className='capitalize'>{tripData.travelingWith}</p>
-                <p className='capitalize'>{tripData.stay}</p>
-                <p className='capitalize'>{tripData.foodPreferance}</p>
-                <p className='capitalize'>{tripData.budgetBreakdown.category}</p>
+                <p className='capitalize'>{tripData && tripData.travelingWith}</p>
+                <p className='capitalize'>{tripData && tripData.stay}</p>
+                <p className='capitalize'>{tripData && tripData.foodPreferance}</p>
+                <p className='capitalize'>{tripData && tripData.budgetBreakdown.category}</p>
               </div>
               <div className='mt-3'>
-                <p>{tripData.overview}</p>
+                <p>{tripData && tripData.overview}</p>
               </div>
               <div className='mt-3'>
                 <h3 className='text-black text-2xl'>Itineraries</h3>
