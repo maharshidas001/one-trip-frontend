@@ -1,7 +1,7 @@
 import MaxWidth from '@/components/MaxWidth';
 import { tripService } from '@/services/Trip';
 import useAuthStore from '@/zustand/authStore';
-import { ArrowLeftIcon, EllipsisVertical } from 'lucide-react';
+import { ArrowLeftIcon } from 'lucide-react';
 import { useEffect, useState, type FC } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
