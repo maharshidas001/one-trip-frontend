@@ -3,6 +3,7 @@ import TripCards from "@/components/TripCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAllTrips } from "@/hooks/useAllTrips";
 import { authService } from "@/services/Auth";
 import { tripService } from "@/services/Trip";
 import useAuthStore from "@/zustand/authStore";
@@ -47,36 +48,26 @@ interface TripData {
 const Dashboard = () => {
 
   const { logout } = useAuthStore();
-  const { setAllTrips, allTrips } = useTripStore();
-  const [isTripLoading, setIsTripLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"trips" | "settings">("trips");
 
-  const handleLogout = useCallback(async () => {
+  const { data, isLoading } = useAllTrips(getTrips);
 
+  const handleLogout = useCallback(async () => {
     const userRes = await authService.logout();
     if (userRes) {
       logout();
     }
-
   }, [logout]);
 
+  async function getTrips() {
+    const allTrips = await tripService.getAllTrips();
+
+    return allTrips;
+  };
+
   useEffect(() => {
-    async function getTrips() {
-      try {
-        const allTrips = await tripService.getAllTrips();
-
-        if (allTrips && allTrips.data) {
-          setAllTrips(allTrips);
-        }
-      } catch (error) {
-        toast('Something went wrong.');
-      } finally {
-        setIsTripLoading(false);
-      }
-    };
-
     getTrips();
-  }, [setAllTrips]);
+  }, []);
 
   return (
     <>
@@ -102,9 +93,9 @@ const Dashboard = () => {
             {/* My Trips */}
             {activeTab === 'trips' && (
               <div className="mt-3">
-                {allTrips && allTrips.data.length > 0 ? (
+                {data && data.data.length > 0 ? (
                   <div>
-                    {isTripLoading ? (
+                    {isLoading ? (
                       <>
                         <div className="flex flex-col w-[306px] gap-8 mt-3">
                           <Skeleton className="h-[208px] w-[306px] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300" />
@@ -128,7 +119,7 @@ const Dashboard = () => {
                       </>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-3">
-                        {allTrips.data.map((trip: TripData) => (
+                        {data.data.map((trip: TripData) => (
                           <TripCards title={trip.tripTitle} image={trip.imageUrl} id={trip._id} key={trip._id} />
                         ))}
                       </div>
