@@ -5,45 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react'
 import FeaturedDestinations from '@/components/FeaturedDestinations';
 import Footer from '@/components/Footer';
-import { authService } from '@/services/Auth';
-import { useEffect, useState } from 'react';
-import useAuthStore from '@/zustand/authStore';
-import { Ring } from 'ldrs/react';
-import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-  const { login, isAuthenticated } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(true);
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    async function getAuthStatus() {
-      try {
-        const res = await authService.getAuthStatus();
-        if (res && res.data) {
-          login(res.data);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getAuthStatus();
-  }, [login, navigate]);
-
-
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">
-      <Ring color='black' size={20} />
-    </div>
-  }
-
-  if (isAuthenticated) {
-    navigate('/dashboard');
-    return null;
-  };
-
   return (
     <>
       <section id='hero-section' className='py-10'>

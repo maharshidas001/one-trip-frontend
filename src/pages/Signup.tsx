@@ -19,28 +19,11 @@ interface ISignupData {
 };
 
 const Signup = () => {
-  const { login, isAuthenticated } = useAuthStore();
+  const { login } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [isFormLoading, setIsFormLoading] = useState(false);
-  const [isAuthCheckLoading, setIsAuthCheckLoading] = useState(true);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    async function getAuthStatus() {
-      try {
-        const res = await authService.getAuthStatus();
-        if (res && res.data) {
-          login(res.data);
-        }
-      } finally {
-        setIsAuthCheckLoading(false); // Auth check is done
-      }
-    };
-
-    getAuthStatus();
-  }, [login, navigate]);
-
 
   const {
     register,
@@ -75,17 +58,6 @@ const Signup = () => {
       .finally(() => {
         setIsFormLoading(false);
       });
-  };
-
-  if (isAuthCheckLoading) {
-    return <div className="flex justify-center items-center h-screen">
-      <Ring color='black' size={20} />
-    </div>
-  };
-
-  if (isAuthenticated) {
-    navigate('/dashboard');
-    return null;
   };
 
   return (

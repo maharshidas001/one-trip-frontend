@@ -1,9 +1,8 @@
 import MaxWidth from '@/components/MaxWidth';
 import { tripService } from '@/services/Trip';
-import useAuthStore from '@/zustand/authStore';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useEffect, useState, type FC } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 interface BudgetBreakdown {
   category: string;
@@ -38,10 +37,8 @@ interface TripData {
 
 const Trip: FC = () => {
 
-  const { isAuthenticated } = useAuthStore();
   const [tripData, setTripData] = useState<TripData | null>(null);
 
-  const navigate = useNavigate();
   const { tripId } = useParams();
 
   useEffect(() => {
@@ -56,11 +53,6 @@ const Trip: FC = () => {
     };
     fetchData();
   }, [tripId]);
-
-  if (!isAuthenticated) {
-    navigate('/auth/login');
-    return null;
-  };
 
   return (
     <>

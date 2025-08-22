@@ -14,4 +14,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
+  esbuild: {
+    pure: ['console.log', 'console.info', 'console.warn', 'console.error'],
+  },
 })

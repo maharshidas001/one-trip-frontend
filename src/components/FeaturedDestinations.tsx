@@ -26,7 +26,7 @@ const FeaturedDestinations = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {destinations.map((destination, index) => (
-        <div>
+        <div key={index}>
           <div
             key={index}
             className="rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"

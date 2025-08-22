@@ -10,7 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { tripService } from "@/services/Trip";
-import useAuthStore from "@/zustand/authStore";
 import { Ring } from "ldrs/react";
 import { ArrowLeftIcon } from 'lucide-react';
 import { useEffect, useState, type FC } from "react";
@@ -31,7 +30,6 @@ interface ICreateTripData {
 
 const CreateTrip: FC = () => {
 
-  const { isAuthenticated } = useAuthStore();
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [trip, setTrip] = useState<any>();
   const navigate = useNavigate();
@@ -65,15 +63,10 @@ const CreateTrip: FC = () => {
   };
 
   useEffect(() => {
-    if (trip) {
+    if (trip && trip._id) {
       navigate(`/dashboard/trip/${trip._id}`);
     }
   }, [trip]);
-
-  if (!isAuthenticated) {
-    navigate('/auth/login');
-    return null;
-  };
 
   return (
     <>

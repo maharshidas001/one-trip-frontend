@@ -17,7 +17,7 @@ class AuthService {
       return res.data; // expected: user object
     } catch (err) {
       console.error("CreateUser Error:", err);
-      return err;
+      throw err;
     }
   }
 
@@ -28,7 +28,7 @@ class AuthService {
       return res.data; // expected: user object
     } catch (err) {
       console.error("LoginUser Error:", err);
-      return err;
+      throw err;
     }
   }
 
@@ -39,7 +39,7 @@ class AuthService {
       return res.data; // expected: { success: true }
     } catch (err) {
       console.error("Logout Error:", err);
-      return err;
+      throw err;
     }
   }
 
@@ -50,7 +50,7 @@ class AuthService {
       return res.data; // expected: user or null
     } catch (err) {
       console.error("AuthStatus Error:", err);
-      return err;
+      throw err;
     }
   }
 }

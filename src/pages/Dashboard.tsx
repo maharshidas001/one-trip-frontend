@@ -7,10 +7,9 @@ import { authService } from "@/services/Auth";
 import { tripService } from "@/services/Trip";
 import useAuthStore from "@/zustand/authStore";
 import useTripStore from "@/zustand/tripStore";
-import { Ring } from "ldrs/react";
 import { PlusIcon, Search } from 'lucide-react';
 import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 interface BudgetBreakdown {
@@ -47,13 +46,10 @@ interface TripData {
 
 const Dashboard = () => {
 
-  const { login, logout, isAuthenticated } = useAuthStore();
+  const { logout } = useAuthStore();
   const { setAllTrips, allTrips } = useTripStore();
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isTripLoading, setIsTripLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"trips" | "settings">("trips");
-
-  const navigate = useNavigate();
 
   const handleLogout = useCallback(async () => {
 
@@ -65,17 +61,6 @@ const Dashboard = () => {
   }, [logout]);
 
   useEffect(() => {
-    async function getAuthStatus() {
-      try {
-        const res = await authService.getAuthStatus();
-        if (res && res.data) {
-          login(res.data);
-        }
-      } finally {
-        setIsAuthLoading(false);
-      }
-    };
-
     async function getTrips() {
       try {
         const allTrips = await tripService.getAllTrips();
@@ -90,20 +75,8 @@ const Dashboard = () => {
       }
     };
 
-    getAuthStatus();
     getTrips();
-  }, [navigate, login, setAllTrips]);
-
-  if (isAuthLoading) {
-    return <div className="flex justify-center items-center h-screen">
-      <Ring color='black' size={20} />
-    </div>
-  };
-
-  if (!isAuthenticated) {
-    navigate('/auth/login');
-    return null;
-  };
+  }, [setAllTrips]);
 
   return (
     <>
