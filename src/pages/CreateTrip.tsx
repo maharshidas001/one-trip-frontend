@@ -9,64 +9,61 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCreateTrip } from "@/hooks/useCreateTrip";
 import { tripService } from "@/services/Trip";
+import type { ICreateTripData } from "@/types/interfaces";
+import useTripStore from "@/zustand/tripStore";
 import { Ring } from "ldrs/react";
 import { ArrowLeftIcon } from 'lucide-react';
 import { useEffect, useState, type FC } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 
-interface ICreateTripData {
-  destination: string;
-  startDate: Date;
-  endDate: Date;
-  travelers: number;
-  travelingWith: string;
-  travelType: string;
-  budget: string;
-  stay: string;
-  food: string;
-}
-
 const CreateTrip: FC = () => {
 
+  const { setSingleTrip } = useTripStore();
+
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
-  const [trip, setTrip] = useState<any>();
   const navigate = useNavigate();
+
+  const { data, mutate } = useCreateTrip(createTrip);
 
   const { handleSubmit, register, control, formState: { errors } } = useForm<ICreateTripData>();
 
+  async function createTrip(data: ICreateTripData) {
+    const tripRes = await tripService.createTrip({
+      destination: data.destination,
+      dateRange: {
+        startDate: data.startDate,
+        endDate: data.endDate,
+      },
+      travelingWith: data.travelingWith,
+      travlerCount: data.travelers,
+      travelType: data.travelType,
+      budget: data.budget,
+      foodPreferance: data.food,
+      stay: data.stay,
+    });
+
+    return tripRes;
+  };
 
   const onSubmit = async (data: ICreateTripData) => {
+    setSingleTrip(null);
     setIsFormSubmitting(true);
-
-    try {
-      const tripRes = await tripService.createTrip({
-        destination: data.destination,
-        dateRange: {
-          startDate: data.startDate,
-          endDate: data.endDate,
-        },
-        travelingWith: data.travelingWith,
-        travlerCount: data.travelers,
-        travelType: data.travelType,
-        budget: data.budget,
-        foodPreferance: data.food,
-        stay: data.stay,
-      });
-      if (tripRes) {
-        setTrip(tripRes);
-      }
-    } finally {
-      setIsFormSubmitting(false);
-    }
+    mutate(data, {
+      onSuccess: () => setIsFormSubmitting(false),
+      onError: () => setIsFormSubmitting(false),
+    });
   };
 
   useEffect(() => {
-    if (trip && trip._id) {
-      navigate(`/dashboard/trip/${trip._id}`);
+    console.log(data);
+    if (data && data.data.newTrip._id) {
+      setSingleTrip(data.data);
+      navigate(`/dashboard/trip/${data.data.newTrip._id}`);
     }
-  }, [trip]);
+  }, [data]);
 
   return (
     <>

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { authService } from "@/services/Auth";
 import useAuthStore from "@/zustand/authStore";
 import { Ring } from "ldrs/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -40,12 +40,11 @@ const Login = () => {
       .then((res) => {
         if (res) {
           login(res.data);
-          toast.success("Login successful!");
           navigate("/dashboard");
         }
       })
       .catch((err) => {
-        toast.error(err.response?.data?.message || "Login failed");
+        toast.error(err.data?.message || "Login failed");
       })
       .finally(() => {
         setIsFormLoading(false);

@@ -7,11 +7,9 @@ import { useAllTrips } from "@/hooks/useAllTrips";
 import { authService } from "@/services/Auth";
 import { tripService } from "@/services/Trip";
 import useAuthStore from "@/zustand/authStore";
-import useTripStore from "@/zustand/tripStore";
 import { PlusIcon, Search } from 'lucide-react';
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { toast } from "sonner";
+import { Link, useNavigate } from "react-router-dom";
 
 interface BudgetBreakdown {
   category: string;
@@ -50,12 +48,15 @@ const Dashboard = () => {
   const { logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState<"trips" | "settings">("trips");
 
+  const navigate = useNavigate();
+
   const { data, isLoading } = useAllTrips(getTrips);
 
   const handleLogout = useCallback(async () => {
     const userRes = await authService.logout();
     if (userRes) {
       logout();
+      navigate('/auth/login');
     }
   }, [logout]);
 

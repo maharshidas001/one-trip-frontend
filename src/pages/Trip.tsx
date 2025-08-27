@@ -42,16 +42,18 @@ const Trip: FC = () => {
   const { tripId } = useParams();
 
   useEffect(() => {
-    async function fetchData() {
+    console.log(tripId);
 
-      const tripRes = await tripService.getSingleTrip({ tripId: tripId as string });
+    // async function fetchData() {
 
-      if (tripRes.data) {
-        setTripData(tripRes.data);
-      }
+    //   const tripRes = await tripService.getSingleTrip({ tripId: tripId as string });
 
-    };
-    fetchData();
+    //   if (tripRes.data) {
+    //     setTripData(tripRes.data);
+    //   }
+
+    // };
+    // fetchData();
   }, [tripId]);
 
   return (
