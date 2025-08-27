@@ -1,5 +1,6 @@
 import MaxWidth from '@/components/MaxWidth';
 import { tripService } from '@/services/Trip';
+// import useTripStore from '@/zustand/tripStore';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useEffect, useState, type FC } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -37,6 +38,7 @@ interface TripData {
 
 const Trip: FC = () => {
 
+  // const { singleTrip } = useTripStore();
   const [tripData, setTripData] = useState<TripData | null>(null);
 
   const { tripId } = useParams();
@@ -44,16 +46,16 @@ const Trip: FC = () => {
   useEffect(() => {
     console.log(tripId);
 
-    // async function fetchData() {
+    async function fetchData() {
 
-    //   const tripRes = await tripService.getSingleTrip({ tripId: tripId as string });
+      const tripRes = await tripService.getSingleTrip({ tripId: tripId as string });
 
-    //   if (tripRes.data) {
-    //     setTripData(tripRes.data);
-    //   }
+      if (tripRes.data) {
+        setTripData(tripRes.data);
+      }
 
-    // };
-    // fetchData();
+    };
+    fetchData();
   }, [tripId]);
 
   return (
