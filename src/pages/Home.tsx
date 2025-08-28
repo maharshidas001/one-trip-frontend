@@ -18,19 +18,17 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handlePlanTripBtn = () => {
-    if (searchInput.trim() === '') return;
+    if (searchInput.trim() !== '') {
+      const planTripFromHomeData = { destination: searchInput, isFromHome: true };
+      localStorage.setItem('planTripFromHome', JSON.stringify(planTripFromHomeData));
 
-    const planTripFromHomeData = { destination: searchInput, isFromHome: true };
-    localStorage.setItem('planTripFromHome', JSON.stringify(planTripFromHomeData));
-
-    navigate('/auth/login');
+      navigate('/auth/login');
+    }
   };
 
   const debouncedSearch = useDebounce(searchInput, 600);
 
   const fetchPlaces = async (searchText: string) => {
-    if (searchText.trim() === '') return;
-
     try {
       const res = await fetch("https://places.googleapis.com/v1/places:autocomplete", {
         method: "POST",
@@ -58,9 +56,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    if (debouncedSearch) {
-      fetchPlaces(debouncedSearch);
-    };
+    fetchPlaces(debouncedSearch);
   }, [debouncedSearch]);
 
   // Handle input change
