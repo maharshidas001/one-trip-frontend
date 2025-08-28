@@ -20,3 +20,12 @@ h6 {
 button {
   cursor: pointer;
 }
+
+#home-page-places-div {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#home-page-places-div::-webkit-scrollbar {
+  display: none;
+}
