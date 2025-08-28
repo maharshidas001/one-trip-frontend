@@ -139,7 +139,7 @@ const CreateTrip: FC = () => {
                   {...register("destination", { required: "Destination is required" })}
                 />
 
-                {searchInputDestination.trim() !== '' &&
+                {(suggestions && searchInputDestination.trim() !== '') &&
                   <div id='home-page-places-div' className='w-full mt-2 py-2 bg-white max-h-[130px] overflow-hidden overflow-y-scroll shadow-lg rounded-sm absolute top-17 border grid gap-1.5'>
                     {suggestions.map((place, index) => (
                       <p className='px-4 cursor-pointer shadow-sm hover:bg-gray-100' onClick={() => {
