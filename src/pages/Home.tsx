@@ -86,7 +86,7 @@ const Home = () => {
                 <Button onClick={handlePlanTripBtn}>Plan Your Trip</Button>
               </div>
 
-              {(suggestions.length > 0 && searchInput.trim() !== '') &&
+              {(suggestions && suggestions.length > 0 && searchInput.trim() !== '') &&
                 <div id='home-page-places-div' className='w-full mt-2 py-2 bg-white max-h-[130px] overflow-hidden overflow-y-scroll shadow-lg rounded-sm absolute grid gap-1.5'>
                   {suggestions.map((place, index) => (
                     <p className='px-4 cursor-pointer shadow-sm hover:bg-gray-100' onClick={() => setSearchInput(place.placePrediction.text.text)} key={index}>{place.placePrediction.text.text}</p>
