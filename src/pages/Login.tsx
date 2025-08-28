@@ -32,6 +32,9 @@ const Login = () => {
   const onSubmit = (data: ILoginData) => {
     setIsFormLoading(true);
 
+    const isPlanTripFromHome = localStorage.getItem('planTripFromHome');
+    const planTripFromHomeObj = JSON.parse(isPlanTripFromHome as string);
+
     authService
       .loginUser({
         email: data.email,
@@ -40,7 +43,9 @@ const Login = () => {
       .then((res) => {
         if (res) {
           login(res.data);
-          navigate("/dashboard");
+          if (planTripFromHomeObj.isFromHome && planTripFromHomeObj.destination.trim() !== '') {
+            navigate('/dashboard/trip/create');
+          } else navigate("/dashboard");
         }
       })
       .catch((err) => {

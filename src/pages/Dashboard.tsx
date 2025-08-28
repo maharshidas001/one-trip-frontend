@@ -67,6 +67,8 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    localStorage.removeItem('planTripFromHome');
+
     getTrips();
   }, []);
 

@@ -68,7 +68,7 @@ class TripService {
       });
       return res.data;
     } catch (err) {
-      console.error("Logout Error:", err);
+      console.error("Trip Creation Error: ", err);
       return err;
     }
   }

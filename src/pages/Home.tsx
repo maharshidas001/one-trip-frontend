@@ -8,11 +8,23 @@ import Footer from '@/components/Footer';
 import useDebounce from '@/hooks/useDebounce';
 import { useEffect, useState } from 'react';
 import { envConfig } from '@/config/envConfig';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
 
   const [searchInput, setSearchInput] = useState('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
+
+  const navigate = useNavigate();
+
+  const handlePlanTripBtn = () => {
+    if (searchInput.trim() === '') return;
+
+    const planTripFromHomeData = { destination: searchInput, isFromHome: true };
+    localStorage.setItem('planTripFromHome', JSON.stringify(planTripFromHomeData));
+
+    navigate('/auth/login');
+  };
 
   const debouncedSearch = useDebounce(searchInput, 600);
 
@@ -39,7 +51,6 @@ const Home = () => {
       });
       const places = await res.json();
 
-      console.log('All places: ', places);
       setSuggestions(places.suggestions);
     } catch (error) {
       console.log('Error while fetching places...', error)
@@ -76,7 +87,7 @@ const Home = () => {
               <div className='bg-white flex items-center py-2 px-3 mt-6 rounded-lg gap-3'>
                 <Search size={35} />
                 <Input type='text' placeholder='Destination' className='border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none focus:border-0 focus:outline-none' value={searchInput} onChange={handleChange} />
-                <Button>Plan Your Trip</Button>
+                <Button onClick={handlePlanTripBtn}>Plan Your Trip</Button>
               </div>
 
               {(suggestions.length > 0 && searchInput.trim() !== '') &&

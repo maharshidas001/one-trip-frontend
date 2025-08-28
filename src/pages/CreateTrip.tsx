@@ -9,7 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { envConfig } from "@/config/envConfig";
 import { useCreateTrip } from "@/hooks/useCreateTrip";
+import useDebounce from "@/hooks/useDebounce";
 import { tripService } from "@/services/Trip";
 import type { ICreateTripData } from "@/types/interfaces";
 import useTripStore from "@/zustand/tripStore";
@@ -24,33 +26,87 @@ const CreateTrip: FC = () => {
   const { setSingleTrip } = useTripStore();
 
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+
   const navigate = useNavigate();
+
+  const isPlanTripFromHome = localStorage.getItem('planTripFromHome');
+  const planTripFromHomeObj = JSON.parse(isPlanTripFromHome as string);
+
+  // React Hook form
+  const { handleSubmit, register, control, formState: { errors }, watch, setValue } = useForm<ICreateTripData>({
+    defaultValues: {
+      destination: (planTripFromHomeObj && planTripFromHomeObj.destination) || ''
+    }
+  });
+
+  const searchInputDestination = watch('destination');
+
+  // Debounce start --------------
+  const debouncedSearch = useDebounce(searchInputDestination, 600);
+
+  const fetchPlaces = async (searchText: string) => {
+    if (searchText.trim() === '') return;
+
+    try {
+      const res = await fetch("https://places.googleapis.com/v1/places:autocomplete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": envConfig.cloudKey,
+          "X-Goog-FieldMask": "suggestions.placePrediction.placeId,suggestions.placePrediction.text"
+        },
+        body: JSON.stringify({
+          input: searchText,
+          includedPrimaryTypes: [
+            "locality",
+            "country",
+            "tourist_attraction",
+            "point_of_interest"
+          ],
+        })
+      });
+      const places = await res.json();
+
+      setSuggestions(places.suggestions);
+    } catch (error) {
+      console.log('Error while fetching places...', error)
+    }
+  };
+
+  useEffect(() => {
+    fetchPlaces(debouncedSearch);
+  }, [debouncedSearch]);
+  // End Debounce ------------------
 
   const { data, mutate } = useCreateTrip(createTrip);
 
-  const { handleSubmit, register, control, formState: { errors } } = useForm<ICreateTripData>();
-
-  async function createTrip(data: ICreateTripData) {
+  // Handle create trip
+  async function createTrip(tripData: ICreateTripData) {
     const tripRes = await tripService.createTrip({
-      destination: data.destination,
+      destination: tripData.destination,
       dateRange: {
-        startDate: data.startDate,
-        endDate: data.endDate,
+        startDate: tripData.startDate,
+        endDate: tripData.endDate,
       },
-      travelingWith: data.travelingWith,
-      travlerCount: data.travelers,
-      travelType: data.travelType,
-      budget: data.budget,
-      foodPreferance: data.food,
-      stay: data.stay,
+      travelingWith: tripData.travelingWith,
+      travlerCount: tripData.travelers,
+      travelType: tripData.travelType,
+      budget: tripData.budget,
+      foodPreferance: tripData.food,
+      stay: tripData.stay,
     });
 
     return tripRes;
   };
 
+  // On form submit
   const onSubmit = async (data: ICreateTripData) => {
+    localStorage.removeItem('planTripFromHome');
+
     setSingleTrip(null);
     setIsFormSubmitting(true);
+
     mutate(data, {
       onSuccess: () => setIsFormSubmitting(false),
       onError: () => setIsFormSubmitting(false),
@@ -58,10 +114,9 @@ const CreateTrip: FC = () => {
   };
 
   useEffect(() => {
-    console.log(data);
-    if (data && data.data.newTrip._id) {
+    if (data && data?.data?.newTrip?._id) {
       setSingleTrip(data.data);
-      navigate(`/dashboard/trip/${data.data.newTrip._id}`);
+      navigate(`/dashboard/trip/${data?.data?.newTrip?._id}`);
     }
   }, [data]);
 
@@ -78,11 +133,22 @@ const CreateTrip: FC = () => {
             </Link>
             <h2 className="text-3xl text-black text-center mt-3">Create your Trip Plan</h2>
             <form className="mt-4 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
-              <div className="grid gap-2">
+              <div className="grid gap-2 relative">
                 <label htmlFor="destination-field">Destination</label>
                 <Input type="text" placeholder="Ex: Manali" id="destination-field" className="py-5"
                   {...register("destination", { required: "Destination is required" })}
                 />
+
+                {(suggestions.length > 0 && searchInputDestination.trim() !== '') &&
+                  <div id='home-page-places-div' className='w-full mt-2 py-2 bg-white max-h-[130px] overflow-hidden overflow-y-scroll shadow-lg rounded-sm absolute top-17 border grid gap-1.5'>
+                    {suggestions.map((place, index) => (
+                      <p className='px-4 cursor-pointer shadow-sm hover:bg-gray-100' onClick={() => {
+                        setValue('destination', place.placePrediction.text.text);
+                        setSuggestions([]);
+                      }} key={index}>{place.placePrediction.text.text}</p>
+                    ))}
+                  </div>
+                }
                 {errors.destination && <p className="text-sm text-red-500">{errors.destination.message}</p>}
               </div>
 
